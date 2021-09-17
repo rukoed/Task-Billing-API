@@ -40,8 +40,8 @@ namespace Test.Controllers
         {
             if (cart != null)
             {
-                var result = await _orderRepo.SaveOrderAsync(cart);
-                if (result) return Ok($"order with id: {cart.Id} has been added to database");
+                Receipt result = await _orderRepo.SaveOrderAsync(cart);
+                if (result != null) return Ok(result);
             }
 
             return Ok("Nothing changed");

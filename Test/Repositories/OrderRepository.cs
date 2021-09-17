@@ -27,21 +27,23 @@ namespace Test.Repositories
             return enumerable.FirstOrDefault(x => x.Id == id);
         }
 
-        public async Task<bool> SaveOrderAsync(Order order)
+        public async Task<Receipt> SaveOrderAsync(Order order)
         {
             logger.Info("you have made a request to save Order " + Environment.NewLine + DateTime.Now);
+            var lastId = _db.Orders.ToList().LastOrDefault().Id + 1;
+            Receipt receipt;
             try
             {
-                //TODO logic for receipt 
                 _db.Orders.Add(order);
                 _db.SaveChanges();
+                receipt = new Receipt { Id = lastId, ReceiptNumber = Guid.NewGuid() };
             }
             catch (Exception)
             {
-                return false;
+                return new Receipt();
             }
 
-            return true;
+            return receipt;
         }
 
         public async Task<bool> EditOrder(int id, Order order)

@@ -10,7 +10,7 @@ namespace Test.Interfaces
 
         Task<Order> GetByIdAsync(int id);
 
-        Task<bool> SaveOrderAsync(Order order);
+        Task<Receipt> SaveOrderAsync(Order order);
 
         Task<bool> EditOrder(int id, Order order);
 
