@@ -15,8 +15,10 @@ namespace Test.Models
                 OrderNumber = "1",
                 UserId = 11,
                 Amount = 111,
-                PaymentGatewayId = Gateway.GooglePay,
-                OptionalDescription = "1111"
+                PaymentGatewayId = Gateway.PayPal,
+                OptionalDescription = "1111",
+                ClientId = "AfhIhRejlBMo0KP0jg5zqK5xX36nf9X_tZ_pQF1VIWRFucbRWrw-A-oF2JIqxRulCaGrIAiUGcxFxHNa",
+                ClientSecret = "EEtoQO91JtDuUhGbF0rRwPWG203gTkjOZYhicrJV_VOzwMyjIX19OhcbNXoqK1yyTqDag2o8r3pLicei"
             });
             db.Orders.Add(new Order
             {
@@ -24,8 +26,10 @@ namespace Test.Models
                 OrderNumber = "2",
                 UserId = 22,
                 Amount = 222,
-                PaymentGatewayId = Gateway.GooglePay,
-                OptionalDescription = "2222"
+                PaymentGatewayId = Gateway.PayPal,
+                OptionalDescription = "2222",
+                ClientId = "AfhIhRejlBMo0KP0jg5zqK5xX36nf9X_tZ_pQF1VIWRFucbRWrw-A-oF2JIqxRulCaGrIAiUGcxFxHNa",
+                ClientSecret = "EEtoQO91JtDuUhGbF0rRwPWG203gTkjOZYhicrJV_VOzwMyjIX19OhcbNXoqK1yyTqDag2o8r3pLicei"
             });
             db.Orders.Add(new Order
             {
@@ -34,7 +38,9 @@ namespace Test.Models
                 UserId = 33,
                 Amount = 333,
                 PaymentGatewayId = Gateway.SamsungPay,
-                OptionalDescription = "3333"
+                OptionalDescription = "3333",
+                ClientId = "AfhIhRejlBMo0KP0jg5zqK5xX36nf9X_tZ_pQF1VIWRFucbRWrw-A-oF2JIqxRulCaGrIAiUGcxFxHNa",
+                ClientSecret = "EEtoQO91JtDuUhGbF0rRwPWG203gTkjOZYhicrJV_VOzwMyjIX19OhcbNXoqK1yyTqDag2o8r3pLicei"
             });
 
             base.Seed(db);

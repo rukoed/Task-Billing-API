@@ -13,5 +13,9 @@
         public Gateway PaymentGatewayId { get; set; }
 
         public string OptionalDescription { get; set; }
+
+        public string ClientId { get; set; }
+
+        public string ClientSecret { get; set; }
     }
 }

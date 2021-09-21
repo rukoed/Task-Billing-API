@@ -2,7 +2,7 @@
 {
     public enum Gateway
     {
-        GooglePay = 0,
+        PayPal = 0,
         SamsungPay = 1
     }
 }

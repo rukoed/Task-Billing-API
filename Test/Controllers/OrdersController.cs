@@ -1,12 +1,14 @@
-﻿using System.Threading.Tasks;
-using System.Web.Http;
+﻿using System;
+using System.Threading.Tasks;
+using System.Web.Mvc;
+using PayPal.Api;
+using Test.Common;
 using Test.Interfaces;
 using Test.Models;
 
 namespace Test.Controllers
 {
-    [RoutePrefix("orders")]
-    public class OrdersController : ApiController
+    public class OrdersController : Controller
     {
         private readonly IOrderRepository _orderRepo;
 
@@ -15,54 +17,60 @@ namespace Test.Controllers
             _orderRepo = orderRepo;
         }
 
-        [HttpGet]
-        [Route("all")]
-        public async Task<IHttpActionResult> All()
+        public async Task<Result> GetByID(int id)
         {
-            var result = await _orderRepo.GetAllOrdersAsync();
-            return Ok(result);
-        }
+            var res = new Result();
+            var orderData = await _orderRepo.GetByIdAsync(id);
 
-        [HttpGet]
-        [Route("{id}")]
-        public async Task<IHttpActionResult> GetByID(int id)
-        {
-            var result = await _orderRepo.GetByIdAsync(id);
-            if (result == null)
+            switch (orderData.PaymentGatewayId)
             {
-                return NotFound();
+                case Gateway.PayPal:
+                {
+                    var apiContext = PaypalConfiguration.GetAPIContext(orderData.ClientId, orderData.ClientSecret);
+
+                    try
+                    {
+                        //A resource representing a Payer that funds a payment Payment Method as paypal
+                        //Payer Id will be returned when payment proceeds or click to pay
+                        var payerId = orderData.Id.ToString();
+
+                        // This function executes after receiving all parameters for the payment
+
+                        var guid = Guid.NewGuid().ToString();
+                        var executedPayment = ExecutePayment(apiContext, payerId, Session[guid] as string);
+
+                        //If executed payment failed then we will show payment failure message to user
+                        if (executedPayment.state.ToLower() != "approved")
+                        {
+                            res.Status = new HttpStatusCodeResult(400);
+                            return res;
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        res.Status = new HttpStatusCodeResult(400);
+                        return res;
+                    }
+
+                    //on successful payment, show success page to user.
+                    res.Status = new HttpStatusCodeResult(200);
+                    res.Receipt = await _orderRepo.SaveOrderAsync(orderData);
+                    return res;
+                }
+
+                case Gateway.SamsungPay:
+                    break;
             }
-            return Ok(result);
+
+            res.Status = new HttpStatusCodeResult(502);
+            return res;
         }
 
-        [HttpPost]
-        public async Task<IHttpActionResult> CreateOrder([FromBody]Order cart)
+        private Payment ExecutePayment(APIContext apiContext, string payerId, string paymentId)
         {
-            if (cart != null)
-            {
-                Receipt result = await _orderRepo.SaveOrderAsync(cart);
-                if (result != null) return Ok(result);
-            }
-
-            return Ok("Nothing changed");
-        }
-
-        [HttpPut]
-        public async Task<IHttpActionResult> EditOrder(int id, [FromBody]Order cart)
-        {
-            if (cart != null)
-            {
-                var result = await _orderRepo.EditOrder(id, cart);
-                if (result) return Ok($"order with id: {cart.Id} has been updated to database");
-            }
-
-            return Ok("Nothing changed");
-        }
-
-        [HttpDelete]
-        public void DeleteOrder(int id)
-        {
-            _orderRepo.DeleteOrder(id);
+            var paymentExecution = new PaymentExecution {payer_id = payerId};
+            var payment = new Payment {id = paymentId};
+            return payment.Execute(apiContext, paymentExecution);
         }
     }
 }
